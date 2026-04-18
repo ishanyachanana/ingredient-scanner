@@ -1,4 +1,4 @@
-const API = "https://your-app.vercel.app/api/analyze-ingredients";
+const API = "https://ingredient-scanner-mu.vercel.app";
 
 chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   if (msg.type !== "analyze") return;

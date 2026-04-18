@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "Cosmetic Check",
+  "version": "1.0.0",
+  "description": "Understand cosmetic ingredients on marketplace product pages.",
+  "icons": { "128": "icon.png" },
+  "permissions": ["activeTab", "storage"],
+  "host_permissions": [
+    "https://*.nykaa.com/*",
+    "https://*.tirabeauty.com/*",
+    "https://*.amazon.in/*",
+    "https://*.amazon.com/*",
+    "https://your-app.vercel.app/*"
+  ],
+  "background": { "service_worker": "background.js" },
+  "content_scripts": [{
+    "matches": [
+      "https://*.nykaa.com/*",
+      "https://*.tirabeauty.com/*",
+      "https://*.amazon.in/*",
+      "https://*.amazon.com/*"
+    ],
+    "js": ["content.js"],
+    "css": ["overlay.css"],
+    "run_at": "document_idle"
+  }],
+  "action": { "default_title": "Cosmetic Check" }
+}

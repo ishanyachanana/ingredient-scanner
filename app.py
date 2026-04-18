@@ -100,12 +100,14 @@ def call_claude(product_name, ingredients):
 
 @app.route("/debug/env")
 def debug_env():
-    key = os.environ.get("ANTHROPIC_API_KEY")
+    all_keys = sorted(os.environ.keys())
+    system_prefixes = ("AWS_", "VERCEL_", "LAMBDA_", "_", "PATH", "HOME", "PWD",
+                       "LANG", "LC_", "PYTHON", "TZ", "SHLVL", "HOSTNAME")
+    custom_keys = [k for k in all_keys if not k.startswith(system_prefixes)]
     return jsonify({
-        "present": key is not None,
-        "length": len(key) if key else 0,
-        "prefix": key[:7] + "..." if key else None,
-        "stripped_length": len(key.strip()) if key else 0,
+        "anthropic_exact_match": os.environ.get("ANTHROPIC_API_KEY") is not None,
+        "custom_env_var_names": custom_keys,
+        "names_containing_anth_or_api": [k for k in all_keys if "ANTH" in k.upper() or "API" in k.upper()],
     })
 
 def compute_verdict(ingredients):

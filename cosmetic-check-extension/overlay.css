@@ -1,0 +1,30 @@
+#cc-btn {
+  position: fixed; right: 20px; bottom: 20px; z-index: 2147483646;
+  background: #222; color: #fff; border: 0; border-radius: 999px;
+  padding: 12px 18px; font: 600 14px system-ui, sans-serif; cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0,0,0,.2);
+}
+#cc-overlay {
+  position: fixed; right: 20px; bottom: 80px; width: 380px; max-height: 70vh;
+  overflow: auto; z-index: 2147483647;
+  font: 14px system-ui, sans-serif;
+}
+.cc-card { background: #fff; color: #222; border-radius: 12px; padding: 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,.25); position: relative; }
+.cc-close { position: absolute; top: 8px; right: 10px; border: 0; background: none;
+  font-size: 20px; cursor: pointer; color: #888; }
+.cc-name { font-weight: 600; font-size: 15px; margin-right: 20px; }
+.cc-verdict { display: inline-block; padding: 4px 10px; border-radius: 999px;
+  margin: 8px 0; font-weight: 600; font-size: 12px; }
+.cc-verdict.safe { background: #e7f5ea; color: #1e6b33; }
+.cc-verdict.mixed { background: #fff4d6; color: #8a5a00; }
+.cc-verdict.caution { background: #fde4e4; color: #9a1b1b; }
+.cc-card h4 { margin: 12px 0 6px; font-size: 13px; }
+.cc-card ul { margin: 0; padding-left: 18px; }
+.cc-ing { border-top: 1px solid #eee; padding: 8px 0; font-size: 13px; }
+.cc-tag { font-size: 11px; padding: 2px 6px; border-radius: 999px; margin-left: 6px; }
+.cc-tag.cc-good { background: #e7f5ea; color: #1e6b33; }
+.cc-tag.cc-neutral { background: #eee; color: #555; }
+.cc-tag.cc-bad { background: #fde4e4; color: #9a1b1b; }
+.cc-concern { color: #6a3a00; margin-top: 2px; }
+.cc-err { color: #9a1b1b; }

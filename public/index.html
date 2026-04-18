@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Cosmetic Check</title>
+<link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+<main>
+  <h1>Cosmetic Check</h1>
+  <p class="sub">Scan or enter a barcode to understand what's really in a cosmetic product.</p>
+
+  <form id="form">
+    <input id="barcode" inputmode="numeric" pattern="[0-9]*"
+           placeholder="Enter barcode (e.g. 3600541714724)" required/>
+    <button type="submit">Analyze</button>
+    <button type="button" id="scanBtn">Scan with camera</button>
+  </form>
+
+  <video id="video" playsinline hidden></video>
+  <div id="status"></div>
+  <div id="result" hidden></div>
+</main>
+<script src="app.js"></script>
+</body>
+</html>

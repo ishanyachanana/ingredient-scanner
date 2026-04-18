@@ -120,3 +120,14 @@ def compute_verdict(ingredients):
     if concerns / total < 0.2:
         return "Mixed, depends on skin type"
     return "May cause irritation for some"
+
+@app.route("/ping-2026")
+def ping():
+    return jsonify({
+        "deployed": True,
+        "anthropic_present": os.environ.get("ANTHROPIC_API_KEY") is not None,
+        "all_custom_env_keys": [k for k in os.environ.keys()
+                                if not k.startswith(("AWS_", "VERCEL_", "LAMBDA_",
+                                "_", "PATH", "HOME", "PWD", "LANG", "LC_",
+                                "PYTHON", "TZ", "SHLVL", "HOSTNAME"))],
+    })

@@ -131,3 +131,30 @@ def ping():
                                 "_", "PATH", "HOME", "PWD", "LANG", "LC_",
                                 "PYTHON", "TZ", "SHLVL", "HOSTNAME"))],
     })
+@app.route("/api/analyze-ingredients", methods=["POST", "OPTIONS"])
+def analyze_ingredients():
+    cors = {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type",
+    }
+    if request.method == "OPTIONS":
+        return ("", 204, cors)
+
+    body = request.get_json(silent=True) or {}
+    name = (body.get("name") or "Unknown product").strip()
+    ingredients = [i.strip() for i in body.get("ingredients", []) if i and i.strip()]
+    if not ingredients:
+        return (jsonify({"error": "No ingredients provided"}), 400, cors)
+
+    try:
+        analysis = call_claude(name, ingredients[:40])
+    except Exception as e:
+        return (jsonify({"error": f"Analysis failed: {e}"}), 500, cors)
+
+    return (jsonify({
+        "product": {"name": name},
+        "top_insights": analysis["top_insights"],
+        "ingredients": analysis["ingredients"],
+        "verdict": compute_verdict(analysis["ingredients"]),
+    }), 200, cors)

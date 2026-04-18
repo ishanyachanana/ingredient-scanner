@@ -1,0 +1,30 @@
+*{box-sizing:border-box}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:#faf7f2;color:#222;margin:0;padding:2rem 1rem}
+main{max-width:680px;margin:0 auto}
+h1{margin:0 0 .25rem;font-size:1.75rem}
+.sub{color:#666;margin-top:0}
+form{display:flex;gap:.5rem;flex-wrap:wrap;margin:1.5rem 0}
+input{flex:1 1 220px;padding:.75rem 1rem;border:1px solid #ccc;border-radius:8px;font-size:1rem}
+button{padding:.75rem 1rem;border:0;border-radius:8px;background:#222;color:#fff;font-size:1rem;cursor:pointer}
+button#scanBtn{background:#fff;color:#222;border:1px solid #222}
+#status{margin:1rem 0;color:#666}
+#video{width:100%;max-height:300px;background:#000;border-radius:8px;margin-bottom:1rem}
+.card{background:#fff;border:1px solid #eee;border-radius:12px;padding:1.25rem;margin-bottom:1rem}
+.product-name{font-weight:600;font-size:1.1rem}
+.brand{color:#888}
+.verdict{display:inline-block;padding:.4rem .75rem;border-radius:999px;font-weight:600;margin-top:.75rem}
+.verdict.safe{background:#e7f5ea;color:#1e6b33}
+.verdict.mixed{background:#fff4d6;color:#8a5a00}
+.verdict.caution{background:#fde4e4;color:#9a1b1b}
+h2{margin:1.5rem 0 .5rem;font-size:1.1rem}
+.insights li{margin:.25rem 0}
+.ingredient{border-top:1px solid #eee;padding:.75rem 0}
+.ingredient:first-of-type{border-top:0}
+.ing-head{display:flex;align-items:center;justify-content:space-between;gap:.5rem}
+.ing-name{font-weight:600}
+.tag{font-size:.75rem;padding:.15rem .5rem;border-radius:999px;text-transform:lowercase}
+.tag.beneficial{background:#e7f5ea;color:#1e6b33}
+.tag.neutral{background:#eee;color:#555}
+.tag.concern{background:#fde4e4;color:#9a1b1b}
+.ing-function,.ing-concern{margin:.25rem 0;font-size:.95rem}
+.ing-concern{color:#6a3a00}

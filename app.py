@@ -98,6 +98,15 @@ def call_claude(product_name, ingredients):
             text = text.split("\n", 1)[1] if "\n" in text else text[4:]
     return json.loads(text)
 
+@app.route("/debug/env")
+def debug_env():
+    key = os.environ.get("ANTHROPIC_API_KEY")
+    return jsonify({
+        "present": key is not None,
+        "length": len(key) if key else 0,
+        "prefix": key[:7] + "..." if key else None,
+        "stripped_length": len(key.strip()) if key else 0,
+    })
 
 def compute_verdict(ingredients):
     total = len(ingredients)

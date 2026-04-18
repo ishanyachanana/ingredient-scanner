@@ -3,7 +3,6 @@
   "name": "Cosmetic Check",
   "version": "1.0.0",
   "description": "Understand cosmetic ingredients on marketplace product pages.",
-  "icons": { "128": "icon.png" },
   "permissions": ["activeTab", "storage"],
   "host_permissions": [
     "https://*.nykaa.com/*",

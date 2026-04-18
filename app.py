@@ -75,6 +75,16 @@ def analyze():
     })
 
 
+@app.route("/debug")
+def debug():
+    return jsonify({
+        "base_dir": BASE_DIR,
+        "root_contents": sorted(os.listdir(BASE_DIR)),
+        "static_dir": STATIC_DIR,
+        "static_exists": os.path.isdir(STATIC_DIR),
+        "static_contents": sorted(os.listdir(STATIC_DIR)) if os.path.isdir(STATIC_DIR) else None,
+    })
+
 def call_claude(product_name, ingredients):
     user = f'Product: "{product_name}"\nIngredients (in order):\n{json.dumps(ingredients)}'
     resp = get_client().messages.create(

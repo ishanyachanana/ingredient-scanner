@@ -3,7 +3,15 @@ from flask import Flask, request, jsonify, send_from_directory
 from anthropic import Anthropic
 
 app = Flask(__name__, static_folder="public", static_url_path="")
-client = Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+_client = None
+def get_client():
+    global _client
+    if _client is None:
+        key = os.environ.get("ANTHROPIC_API_KEY")
+        if not key:
+            raise RuntimeError("ANTHROPIC_API_KEY is not set")
+        _client = Anthropic(api_key=key)
+    return _client
 
 OBF_URL = "https://world.openbeautyfacts.org/api/v2/product/{barcode}.json"
 MODEL = "claude-haiku-4-5-20251001"
@@ -67,7 +75,7 @@ def analyze():
 
 def call_claude(product_name, ingredients):
     user = f'Product: "{product_name}"\nIngredients (in order):\n{json.dumps(ingredients)}'
-    resp = client.messages.create(
+    resp = get_client().messages.create(
         model=MODEL, max_tokens=2000, system=SYSTEM,
         messages=[{"role": "user", "content": user}],
     )

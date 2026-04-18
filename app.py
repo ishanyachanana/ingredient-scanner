@@ -1,8 +1,11 @@
-import json, os, requests
+import os, json, requests
 from flask import Flask, request, jsonify, send_from_directory
 from anthropic import Anthropic
 
-app = Flask(__name__, static_folder="public", static_url_path="")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+STATIC_DIR = os.path.join(BASE_DIR, "public")
+
+app = Flask(__name__, static_folder=STATIC_DIR, static_url_path="")
 _client = None
 def get_client():
     global _client
@@ -31,7 +34,7 @@ Return ONLY valid JSON, no markdown, no prose. Shape: {"ingredients":[...], "top
 
 @app.route("/")
 def index():
-    return send_from_directory("public", "index.html")
+    return send_from_directory(STATIC_DIR, "index.html")
 
 
 @app.route("/api/analyze")

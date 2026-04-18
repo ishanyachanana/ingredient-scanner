@@ -3,8 +3,7 @@ from flask import Flask, request, jsonify, send_from_directory
 from anthropic import Anthropic
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-STATIC_DIR = os.path.join(BASE_DIR, "public")
-
+STATIC_DIR = os.path.join(BASE_DIR, "web")
 app = Flask(__name__, static_folder=STATIC_DIR, static_url_path="")
 _client = None
 def get_client():

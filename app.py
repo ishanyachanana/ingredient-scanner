@@ -85,18 +85,42 @@ def debug():
         "static_contents": sorted(os.listdir(STATIC_DIR)) if os.path.isdir(STATIC_DIR) else None,
     })
 
-def call_claude(product_name, ingredients):
+import time
+
+def call_claude(product_name, ingredients, retries=1):
     user = f'Product: "{product_name}"\nIngredients (in order):\n{json.dumps(ingredients)}'
-    resp = get_client().messages.create(
-        model=MODEL, max_tokens=2000, system=SYSTEM,
-        messages=[{"role": "user", "content": user}],
-    )
-    text = resp.content[0].text.strip()
-    if text.startswith("```"):
-        text = text.strip("`")
-        if text.lstrip().lower().startswith("json"):
-            text = text.split("\n", 1)[1] if "\n" in text else text[4:]
-    return json.loads(text)
+    last_err = None
+    for attempt in range(retries + 1):
+        try:
+            resp = get_client().messages.create(
+                model=MODEL, max_tokens=1500, system=SYSTEM,
+                messages=[{"role": "user", "content": user}],
+            )
+            text = resp.content[0].text.strip()
+            if text.startswith("```"):
+                text = text.strip("`")
+                if text.lstrip().lower().startswith("json"):
+                    text = text.split("\n", 1)[1] if "\n" in text else text[4:]
+            parsed = json.loads(text)
+            if not isinstance(parsed.get("ingredients"), list) or not isinstance(parsed.get("top_insights"), list):
+                raise ValueError("Claude returned unexpected shape")
+            # Normalize each ingredient
+            for ing in parsed["ingredients"]:
+                if ing.get("class") not in ("beneficial", "neutral", "potential concern"):
+                    ing["class"] = "neutral"
+                ing.setdefault("function", "")
+                ing.setdefault("concerns", "None")
+            parsed["top_insights"] = [str(x) for x in parsed["top_insights"][:3]]
+            return parsed
+        except Exception as e:
+            last_err = e
+            # Retry on transient errors only
+            msg = str(e).lower()
+            if attempt < retries and ("529" in msg or "overloaded" in msg or "timeout" in msg):
+                time.sleep(1.5)
+                continue
+            raise
+    raise last_err
 
 @app.route("/debug/env")
 def debug_env():
@@ -148,7 +172,7 @@ def analyze_ingredients():
         return (jsonify({"error": "No ingredients provided"}), 400, cors)
 
     try:
-        analysis = call_claude(name, ingredients[:40])
+        analysis = call_claude(name, ingredients[:25])
     except Exception as e:
         return (jsonify({"error": f"Analysis failed: {e}"}), 500, cors)
 

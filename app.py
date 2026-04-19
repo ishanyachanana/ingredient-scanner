@@ -1,6 +1,7 @@
 import os, json, requests
 from flask import Flask, request, jsonify, send_from_directory
 from anthropic import Anthropic
+import time
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_DIR = os.path.join(BASE_DIR, "web")
@@ -84,8 +85,6 @@ def debug():
         "static_exists": os.path.isdir(STATIC_DIR),
         "static_contents": sorted(os.listdir(STATIC_DIR)) if os.path.isdir(STATIC_DIR) else None,
     })
-
-import time
 
 def call_claude(product_name, ingredients, retries=1):
     user = f'Product: "{product_name}"\nIngredients (in order):\n{json.dumps(ingredients)}'

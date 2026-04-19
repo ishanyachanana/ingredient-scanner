@@ -15,7 +15,7 @@
     let ingredients = findIngredients();
 
     // Try 2: click anything labeled "Ingredients" to expand accordions/tabs, then scrape again
-    if (!ingredients || ingredients.length < 3) {
+    if (!ingredients || ingredients.length < 8) {
       const opened = tryExpandIngredientSection();
       if (opened) {
         await waitMs(900);

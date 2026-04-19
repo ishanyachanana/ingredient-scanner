@@ -109,14 +109,25 @@
   }
 
   function parseList(raw) {
-    if (!raw) return null;
-    const parts = raw
-      .split(/[,;]/)
-      .map(s => s.replace(/\([^)]*\)/g, "").replace(/\s+/g, " ").trim())
-      .filter(s => s.length >= 2 && s.length < 120 && /[a-z]/i.test(s));
-    return parts.length >= 3 ? parts.slice(0, 60) : null;
-  }
-
+  if (!raw) return null;
+  const junkWords = /^(read more|show more|see more|view more|less|disclaimer|note|ml|g|oz|inr|rs|rupees|usd|free|new|sale)$/i;
+  const seen = new Set();
+  const parts = raw
+    .split(/[,;]/)
+    .map(s => s.replace(/\([^)]*\)/g, "").replace(/\*+/g, "").replace(/\s+/g, " ").trim())
+    .filter(s => {
+      if (s.length < 2 || s.length > 120) return false;
+      if (!/[a-z]/i.test(s)) return false;          // must contain letters
+      if (/^\d+\s*(ml|g|oz|mg|kg|l|%)?$/i.test(s)) return false;  // pure measurements
+      if (junkWords.test(s)) return false;
+      const key = s.toLowerCase();
+      if (seen.has(key)) return false;              // dedupe
+      seen.add(key);
+      return true;
+    });
+  return parts.length >= 3 ? parts.slice(0, 60) : null;
+}
+  
   const waitMs = (ms) => new Promise(r => setTimeout(r, ms));
 
   function showOverlay(state) {

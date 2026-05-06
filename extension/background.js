@@ -1,5 +1,5 @@
 const API = "https://ingredient-scanner-mu.vercel.app/api/analyze-ingredients";
-const SECRET = "the-same-long-string";
+const SECRET = "PC7lbIDqBOrh9UWpiWcpACLE3mQ1ofGjtgeb98fd";
 
 chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   if (msg.type !== "analyze") return;
@@ -15,10 +15,9 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
 
       const r = await fetch(API, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "X-Client-Secret": SECRET },
         body: JSON.stringify({ name: msg.name, ingredients: msg.ingredients }),
         signal: controller.signal,
-        headers: { "Content-Type": "application/json", "X-Client-Secret": SECRET },
       });
 
       clearTimeout(timer);

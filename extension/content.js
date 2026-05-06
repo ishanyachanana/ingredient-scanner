@@ -16,8 +16,6 @@
   async function run() {
     showOverlay({ loading: true });
 
-    const name = getProductName();
-
     // CHECK CACHE FIRST
     const cacheKey = "cc:" + name;
     const cached = (await chrome.storage.local.get(cacheKey))[cacheKey];

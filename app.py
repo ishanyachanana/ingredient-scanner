@@ -31,6 +31,8 @@ Also return "top_insights": an array of exactly 3 short strings with the most us
 
 Return ONLY valid JSON, no markdown, no prose. Shape: {"ingredients":[...], "top_insights":[...]}"""
 
+if EXTENSION_SECRET and request.headers.get("X-Client-Secret") != EXTENSION_SECRET:
+    return (jsonify({"error": "Unauthorized"}), 401, cors)
 
 @app.route("/")
 def index():

@@ -5,7 +5,7 @@ import time
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_DIR = os.path.join(BASE_DIR, "web")
-EXTENSION_SECRET = os.environ.get("EXTENSION_SECRET", "")
+# EXTENSION_SECRET = os.environ.get("EXTENSION_SECRET", "")
 
 app = Flask(__name__, static_folder=STATIC_DIR, static_url_path="")
 _client = None
@@ -166,8 +166,8 @@ def analyze_ingredients():
     if request.method == "OPTIONS":
         return ("", 204, cors)
 
-    if EXTENSION_SECRET and request.headers.get("X-Client-Secret") != EXTENSION_SECRET:
-        return (jsonify({"error": "Unauthorized"}), 401, cors)
+    # if EXTENSION_SECRET and request.headers.get("X-Client-Secret") != EXTENSION_SECRET:
+    #   return (jsonify({"error": "Unauthorized"}), 401, cors)
     
     body = request.get_json(silent=True) or {}
     name = (body.get("name") or "Unknown product").strip()

@@ -6,15 +6,18 @@
   btn.id = "cc-btn";
   btn.textContent = "Check ingredients";
   document.body.appendChild(btn);
+
   let busy = false;
   btn.addEventListener("click", async () => {
     if (busy) return;
     busy = true;
     try { await run(); } finally { setTimeout(() => busy = false, 3000); }
-});
+  });
 
   async function run() {
     showOverlay({ loading: true });
+
+    const name = getProductName();
 
     // CHECK CACHE FIRST
     const cacheKey = "cc:" + name;
@@ -37,21 +40,31 @@
     }
 
     // Try 3: regex the full body text as a last resort
-    if (!ingredients || ingredients.length < 3) {
+    if (!ingredients || ingredients.length < 8) {
       ingredients = findByTextPattern();
     }
 
-    if (!ingredients || ingredients.length < 3) {
-      showOverlay({ error: "Couldn't find an ingredients list. Open the Ingredients section on the page, then click the button again." });
+    if (!ingredients || ingredients.length < 8) {
+      showOverlay({ error: "Only found " + (ingredients?.length || 0) + " items — likely marketing text, not the real INCI list. Scroll to the Ingredients accordion on the page, expand it, then click the button again." });
       return;
     }
 
-    const name = getProductName();
-    chrome.runtime.sendMessage({ type: "analyze", name, ingredients }, (resp) => {
-      if (!resp?.ok) return showOverlay({ error: resp?.error || "Unknown error" });
-      chrome.storage.local.set({ [cacheKey]: { t: Date.now(), data: resp.data } });
-      showOverlay({ data: resp.data });
-    });
+    try {
+      chrome.runtime.sendMessage({ type: "analyze", name, ingredients }, (resp) => {
+        if (chrome.runtime.lastError) {
+          return showOverlay({ error: "Extension was reloaded. Refresh this page and try again." });
+        }
+        if (!resp?.ok) return showOverlay({ error: resp?.error || "Unknown error" });
+        chrome.storage.local.set({ [cacheKey]: { t: Date.now(), data: resp.data } });
+        showOverlay({ data: resp.data });
+      });
+    } catch (e) {
+      if (/Extension context invalidated/i.test(e.message)) {
+        showOverlay({ error: "Extension was reloaded. Refresh this page and try again." });
+      } else {
+        showOverlay({ error: e.message });
+      }
+    }
   }
 
   function getProductName() {
@@ -64,7 +77,6 @@
       const t = (el.textContent || "").trim().toLowerCase();
       if (t.length === 0 || t.length > 50) return false;
       if (!/\bingredients?\b/.test(t)) return false;
-      // Skip elements that contain huge trees — we want the header, not the whole card
       if (el.querySelectorAll("*").length > 20) return false;
       return true;
     });
@@ -90,19 +102,16 @@
   }
 
   function grabTextNear(label) {
-    // Check following siblings first
     let sib = label.nextElementSibling;
     while (sib) {
       const t = (sib.textContent || "").trim();
       if (t.length > 60 && t.includes(",")) return t;
       sib = sib.nextElementSibling;
     }
-    // Check parent's remaining text
     const parent = label.parentElement;
     if (parent) {
       const raw = (parent.textContent || "").replace(label.textContent || "", "").trim();
       if (raw.length > 60 && raw.includes(",")) return raw;
-      // Check parent's following siblings (accordion pattern)
       let pnext = parent.nextElementSibling;
       while (pnext) {
         const t = (pnext.textContent || "").trim();
@@ -117,31 +126,30 @@
     const text = (document.body.textContent || "").replace(/\s+/g, " ");
     const match = text.match(/ingredients?\s*[:\-]\s*([A-Za-z0-9][^\n]{60,3000})/i);
     if (!match) return null;
-    // Cut at likely end markers
     const cut = match[1].split(/\b(?:how to use|directions|warnings?|benefits|about this item|country of origin|storage|shelf life|manufactured)\b/i)[0];
     return parseList(cut);
   }
 
   function parseList(raw) {
-  if (!raw) return null;
-  const junkWords = /^(read more|show more|see more|view more|less|disclaimer|note|ml|g|oz|inr|rs|rupees|usd|free|new|sale)$/i;
-  const seen = new Set();
-  const parts = raw
-    .split(/[,;]/)
-    .map(s => s.replace(/\([^)]*\)/g, "").replace(/\*+/g, "").replace(/\s+/g, " ").trim())
-    .filter(s => {
-      if (s.length < 2 || s.length > 120) return false;
-      if (!/[a-z]/i.test(s)) return false;          // must contain letters
-      if (/^\d+\s*(ml|g|oz|mg|kg|l|%)?$/i.test(s)) return false;  // pure measurements
-      if (junkWords.test(s)) return false;
-      const key = s.toLowerCase();
-      if (seen.has(key)) return false;              // dedupe
-      seen.add(key);
-      return true;
-    });
-  return parts.length >= 3 ? parts.slice(0, 60) : null;
-}
-  
+    if (!raw) return null;
+    const junkWords = /^(read more|show more|see more|view more|less|disclaimer|note|ml|g|oz|inr|rs|rupees|usd|free|new|sale)$/i;
+    const seen = new Set();
+    const parts = raw
+      .split(/[,;]/)
+      .map(s => s.replace(/\([^)]*\)/g, "").replace(/\*+/g, "").replace(/\s+/g, " ").trim())
+      .filter(s => {
+        if (s.length < 2 || s.length > 120) return false;
+        if (!/[a-z]/i.test(s)) return false;
+        if (/^\d+\s*(ml|g|oz|mg|kg|l|%)?$/i.test(s)) return false;
+        if (junkWords.test(s)) return false;
+        const key = s.toLowerCase();
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+    return parts.length >= 3 ? parts.slice(0, 60) : null;
+  }
+
   const waitMs = (ms) => new Promise(r => setTimeout(r, ms));
 
   function showOverlay(state) {

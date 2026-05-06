@@ -9,7 +9,6 @@
     "https://*.tirabeauty.com/*",
     "https://*.amazon.in/*",
     "https://*.amazon.com/*",
-    "https://ingredient-scanner-mu.vercel.app/*"
   ],
   "background": { "service_worker": "background.js" },
   "content_scripts": [{

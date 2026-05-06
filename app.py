@@ -5,6 +5,8 @@ import time
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_DIR = os.path.join(BASE_DIR, "web")
+EXTENSION_SECRET = os.environ.get("EXTENSION_SECRET", "")
+
 app = Flask(__name__, static_folder=STATIC_DIR, static_url_path="")
 _client = None
 def get_client():
@@ -31,8 +33,6 @@ Also return "top_insights": an array of exactly 3 short strings with the most us
 
 Return ONLY valid JSON, no markdown, no prose. Shape: {"ingredients":[...], "top_insights":[...]}"""
 
-if EXTENSION_SECRET and request.headers.get("X-Client-Secret") != EXTENSION_SECRET:
-    return (jsonify({"error": "Unauthorized"}), 401, cors)
 
 @app.route("/")
 def index():
@@ -166,6 +166,9 @@ def analyze_ingredients():
     if request.method == "OPTIONS":
         return ("", 204, cors)
 
+    if EXTENSION_SECRET and request.headers.get("X-Client-Secret") != EXTENSION_SECRET:
+        return (jsonify({"error": "Unauthorized"}), 401, cors)
+    
     body = request.get_json(silent=True) or {}
     name = (body.get("name") or "Unknown product").strip()
     ingredients = [i.strip() for i in body.get("ingredients", []) if i and i.strip()]

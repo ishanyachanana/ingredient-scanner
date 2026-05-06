@@ -94,7 +94,7 @@ def call_claude(product_name, ingredients, retries=1):
     for attempt in range(retries + 1):
         try:
             resp = get_client().messages.create(
-                model=MODEL, max_tokens=2500, system=SYSTEM,
+                model=MODEL, max_tokens=1500, system=SYSTEM,
                 messages=[{"role": "user", "content": user}],
             )
             text = resp.content[0].text.strip()
@@ -173,7 +173,7 @@ def analyze_ingredients():
         return (jsonify({"error": "No ingredients provided"}), 400, cors)
 
     try:
-        analysis = call_claude(name, ingredients[:25])
+        analysis = call_claude(name, ingredients[:18])
     except Exception as e:
         return (jsonify({"error": f"Analysis failed: {e}"}), 500, cors)
 

@@ -6,10 +6,25 @@
   btn.id = "cc-btn";
   btn.textContent = "Check ingredients";
   document.body.appendChild(btn);
-  btn.addEventListener("click", run);
+  let busy = false;
+  btn.addEventListener("click", async () => {
+    if (busy) return;
+    busy = true;
+    try { await run(); } finally { setTimeout(() => busy = false, 3000); }
+});
 
   async function run() {
     showOverlay({ loading: true });
+
+    const name = getProductName();
+
+    // CHECK CACHE FIRST
+    const cacheKey = "cc:" + name;
+    const cached = (await chrome.storage.local.get(cacheKey))[cacheKey];
+    if (cached && Date.now() - cached.t < 7 * 24 * 3600 * 1000) {
+      showOverlay({ data: cached.data });
+      return;
+    }
 
     // Try 1: scrape what's already visible / in DOM
     let ingredients = findIngredients();
@@ -36,6 +51,7 @@
     const name = getProductName();
     chrome.runtime.sendMessage({ type: "analyze", name, ingredients }, (resp) => {
       if (!resp?.ok) return showOverlay({ error: resp?.error || "Unknown error" });
+      chrome.storage.local.set({ [cacheKey]: { t: Date.now(), data: resp.data } });
       showOverlay({ data: resp.data });
     });
   }

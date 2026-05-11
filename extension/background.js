@@ -15,7 +15,7 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
       const r = await fetch(API, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: msg.name, ingredients: msg.ingredients }),
+        body: JSON.stringify({ name: msg.name, ingredients: msg.ingredients, marketplace: msg.marketplace }),
         signal: controller.signal,
       });
 

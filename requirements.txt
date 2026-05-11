@@ -1,3 +1,4 @@
 flask
 requests
 anthropic
+supabase==2.3.0

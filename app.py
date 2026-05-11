@@ -1,5 +1,4 @@
 import os, json, requests
-from supabase import create_client
 from flask import Flask, request, jsonify, send_from_directory
 from anthropic import Anthropic
 import time
@@ -18,28 +17,30 @@ def get_client():
         _client = Anthropic(api_key=key)
     return _client
 
-_supabase = None
-def get_supabase():
-    global _supabase
-    if _supabase is None:
-        url = os.environ.get("SUPABASE_URL")
-        key = os.environ.get("SUPABASE_KEY")
-        if url and key:
-            _supabase = create_client(url, key)
-    return _supabase
-
 def log_scan(product_name, ingredients_count, marketplace, country, region, verdict):
     try:
-        sb = get_supabase()
-        if sb:
-            sb.table("scans").insert({
+        url = os.environ.get("SUPABASE_URL")
+        key = os.environ.get("SUPABASE_KEY")
+        if not url or not key:
+            return
+        requests.post(
+            f"{url}/rest/v1/scans",
+            headers={
+                "apikey": key,
+                "Authorization": f"Bearer {key}",
+                "Content-Type": "application/json",
+                "Prefer": "return=minimal"
+            },
+            json={
                 "product_name": product_name,
                 "ingredients_count": ingredients_count,
                 "marketplace": marketplace,
                 "country": country,
                 "region": region,
                 "verdict": verdict,
-            }).execute()
+            },
+            timeout=3
+        )
     except Exception as e:
         print(f"Logging failed (non-fatal): {e}")
         

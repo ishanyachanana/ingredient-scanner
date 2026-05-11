@@ -18,6 +18,7 @@
     showOverlay({ loading: true });
 
     const name = getProductName();
+    const marketplace = window.location.hostname; // e.g. "www.nykaa.com"
 
     // CHECK CACHE FIRST
     const cacheKey = "cc:" + name;

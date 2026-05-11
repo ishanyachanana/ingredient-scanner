@@ -51,7 +51,7 @@
     }
 
     try {
-      chrome.runtime.sendMessage({ type: "analyze", name, ingredients }, (resp) => {
+      chrome.runtime.sendMessage({ type: "analyze", name, ingredients, marketplace }, (resp) => {
         if (chrome.runtime.lastError) {
           return showOverlay({ error: "Extension was reloaded. Refresh this page and try again." });
         }

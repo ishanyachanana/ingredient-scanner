@@ -39,6 +39,8 @@ def log_scan(product_name, ingredients_count, marketplace, country, region, verd
                 "country": country,
                 "region": region,
                 "verdict": verdict,
+                "top_insights": top_insights,
+                "ingredients": ingredients,
             },
             timeout=3
         )
@@ -234,7 +236,9 @@ def analyze_ingredients():
     country = request.headers.get("X-Vercel-IP-Country", "Unknown")
     region = request.headers.get("X-Vercel-IP-Country-Region", "Unknown")
     marketplace = body.get("marketplace", "Unknown")
-    log_scan(name, len(ingredients), marketplace, country, region, verdict)
+    log_scan(name, len(ingredients), marketplace, country, region, verdict,
+         top_insights=analysis["top_insights"],
+         ingredients=analysis["ingredients"])
 
     return (jsonify({
         "product": {"name": name},

@@ -35,10 +35,10 @@
   display: inline-block; padding: 5px 12px; border-radius: 999px;
   margin: 10px 0 4px; font-weight: 700; font-size: 12px; letter-spacing: .3px;
 }
-.cc-verdict.excellent { background: #bbf7d0; color: #14532d; }   /* pastel green */
-.cc-verdict.good      { background: #d9f99d; color: #1a3d00; }   /* pastel lime */
-.cc-verdict.caution   { background: #fef08a; color: #3d3000; }   /* pastel yellow */
-.cc-verdict.avoid     { background: #fecaca; color: #3d0f0f; }   /* pastel red */
+.cc-verdict.excellent { background: #c8f0d4; color: #1e6b33; }   /* brighter beneficial green */
+.cc-verdict.good      { background: #e7f5ea; color: #1e6b33; }   /* same as beneficial tag */
+.cc-verdict.caution   { background: #fff4d6; color: #8a5a00; }   /* same as low concern tag */
+.cc-verdict.avoid     { background: #fde4e4; color: #9a1b1b; }   /* same as concern/bad tag */
 
 /* Change 1: Top insights section with label + spaced bullet points */
 .cc-insights-block { margin: 14px 0 6px; }

@@ -35,9 +35,9 @@
   display: inline-block; padding: 5px 12px; border-radius: 999px;
   margin: 10px 0 4px; font-weight: 700; font-size: 12px; letter-spacing: .3px;
 }
-.cc-verdict.safe    { background: #e7f5ea; color: #1e6b33; }
-.cc-verdict.mixed   { background: #fff4d6; color: #8a5a00; }
-.cc-verdict.caution { background: #fde4e4; color: #9a1b1b; }
+.cc-verdict.safe    { background: #1a7a3a; color: #ffffff; }   /* dark green — safe */
+.cc-verdict.mixed   { background: #c47f00; color: #ffffff; }   /* amber — use with caution */
+.cc-verdict.caution { background: #b71c1c; color: #ffffff; }   /* deep red — avoid */
 
 /* Change 1: Top insights section with label + spaced bullet points */
 .cc-insights-block { margin: 14px 0 6px; }

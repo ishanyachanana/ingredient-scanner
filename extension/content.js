@@ -154,95 +154,139 @@
   const waitMs = (ms) => new Promise(r => setTimeout(r, ms));
 
   // Change 4: client-side comedogenic ingredient list
-  // Comedogenic rating 4-5 (high risk) — common names + INCI names
-  // Sources: Kligman & Mills scale, published dermatology comedogenicity research
+  // Comedogenic ratings directly from Fulton (1989) Table I
+  // Journal of the Society of Cosmetic Chemists, 40, 321-333
+  // Only ingredients rated 4-5 (confirmed) included
+  // Grade 3 ingredients noted separately for reference but not flagged
+
   const COMEDOGENIC = new Set([
 
-    // ── HIGHLY COMEDOGENIC OILS (rating 4-5) ──
-    "coconut oil", "cocos nucifera oil", "cocos nucifera (coconut) oil",
-    "cocoa butter", "theobroma cacao seed butter",
-    "wheat germ oil", "triticum vulgare germ oil", "triticum vulgare (wheat) germ oil",
-    "flaxseed oil", "linum usitatissimum seed oil",
-    "linseed oil",
-    "palm oil", "elaeis guineensis oil",
-    "soybean oil", "glycine soja oil", "glycine soja (soybean) oil",
-    "cotton seed oil", "gossypium herbaceum seed oil",
-    "olive oil", "olea europaea fruit oil", "olea europaea (olive) fruit oil",
-    "corn oil", "zea mays oil",
-    "peach kernel oil", "prunus persica kernel oil",
-    "apricot kernel oil", "prunus armeniaca kernel oil",
-    "almond oil", "sweet almond oil", "prunus amygdalus dulcis oil",
-    "avocado oil", "persea gratissima oil",
-    "sesame oil", "sesamum indicum seed oil",
-    "evening primrose oil", "oenothera biennis oil",
-    "rosehip oil", "rosa canina fruit oil", "rosa moschata seed oil",
-    "marula oil", "sclerocarya birrea seed oil",
-    "hemp seed oil", "cannabis sativa seed oil",
-    "pumpkin seed oil", "cucurbita pepo seed oil",
-
-    // ── MODERATE-HIGH COMEDOGENIC OILS (rating 3-4) ──
-    "shea butter", "butyrospermum parkii butter",
-    "lanolin", "acetylated lanolin", "lanolin alcohol",
-    "mink oil",
-    "carrot oil", "daucus carota sativa oil",
-
-    // ── PORE-CLOGGING ESTERS (rating 4-5) ──
-    "isopropyl myristate",
-    "isopropyl palmitate",
-    "isopropyl isostearate",
-    "butyl stearate",
-    "isostearyl isostearate",
-    "decyl oleate",
-    "octyl stearate",
-    "octyl palmitate", "ethylhexyl palmitate",
-    "myristyl myristate",
-    "myristyl lactate",
-    "isocetyl stearate",
-    "isodecyl oleate",
-    "propylene glycol monostearate",
-    "glyceryl-3-diisostearate",
-    "hexadecyl alcohol",
-
-    // ── IRRITATING / BARRIER-DISRUPTING ──
-    "sodium lauryl sulfate", "sls",
-    "sodium laureth sulfate", "sles",
-    "ammonium lauryl sulfate",
-    "alcohol denat", "denatured alcohol", "sd alcohol",
-    "sd alcohol 40", "alcohol sd-40",
-
-    // ── HEAVY SILICONES (occlusive, rating 3-4) ──
-    "dimethicone",
-    "cyclopentasiloxane",
-    "cyclohexasiloxane",
-    "cyclomethicone",
-
-    // ── ALGAE / SEAWEED (can be comedogenic) ──
-    "algae extract", "algae", "seaweed extract",
-    "carrageenan",
-    "red algae extract",
-
-    // ── OTHER KNOWN COMEDOGENS ──
-    "coal tar",
-    "sodium chloride",          // table salt — clogs pores in rinse-off products
-    "potassium chloride",
-    "lauric acid",              // found in coconut — highly comedogenic component
-    "myristic acid",
-    "stearic acid",             // rating 2-3, included for awareness
+    // ── LANOLINS — rated 4 (Fulton Table I) ──
     "acetylated lanolin alcohol",
-    "peg-16 lanolin",
-    "sulfated castor oil",
-    "oleic acid",               // the comedogenic fraction in many oils
-    "d&c red dyes",             // dyes linked to comedogenicity
-    "benzaldehyde"
+    "peg-16 lanolin", "peg 16 lanolin",
+
+    // ── FATTY ACIDS & ESTERS — rated 4-5 (Fulton Table I) ──
+    "lauric acid",                    // rated 4
+    "cetyl acetate",                  // rated 4
+    "ethylhexyl palmitate",           // rated 4
+    "isopropyl linolate",             // rated 4
+    "isopropyl isostearate",          // rated 5
+    "isopropyl myristate",            // rated 5
+    "isopropyl palmitate",            // rated 4
+    "isostearyl isostearate",         // rated 4
+    "myristyl lactate",               // rated 4
+    "myristyl myristate",             // rated 5
+    "stearyl heptanoate",             // rated 4
+
+    // ── ALCOHOLS — rated 4 (Fulton Table I) ──
+    "isocetyl alcohol",               // rated 4
+    "oleyl alcohol",                  // rated 4
+    "cetearyl alcohol",               // rated 4 (when combined with ceteareth-20)
+
+    // ── GLYCOLS & DERIVATIVES — rated 4 (Fulton Table I) ──
+    "glyceryl-3-diisostearate",       // rated 4
+    "polyglyceryl-3-diisostearate",   // rated 4
+    "polyglyceryl 3 diisostearate",
+
+    // ── ETHOXYLATES — rated 4-5 (Fulton Table I) ──
+    "laureth-4",                      // rated 5
+    "steareth-10",                    // rated 4
+    "oleth-3",                        // rated 5
+    "ppp 5 ceteth 10 phosphate",      // rated 4
+
+    // ── OILS — rated 4 (Fulton Table I) ──
+    "cocoa butter", "theobroma cacao seed butter",          // rated 4
+    "coconut butter", "coconut oil", "cocos nucifera oil",  // rated 4
+
+    // ── GRADE 3 (borderline, worth flagging) ──
+    "butyl stearate",                 // rated 3
+    "decyl oleate",                   // rated 3
+    "dioctyl malate",                 // rated 3
+    "dioctyl succinate",              // rated 3
+    "wheat germ glyceride",           // rated 3
+    "peg-8 stearate", "peg 8 stearate", // rated 3
+    "peg-200 dilaurate", "peg 200 dilaurate", // rated 3
+    "laureth-23",                     // rated 3
+    "oleth-5",                        // rated 3
+    "sulfated jojoba oil",            // rated 3
+    "glyceryl stearate se",           // rated 3 (SE form only)
+    "sorbitan oleate",                // rated 3
+    "myristic acid",                  // rated 3
+    "hydrogenated vegetable oil",     // rated 3
+    "sesame oil", "sesamum indicum seed oil",   // rated 3
+    "corn oil", "zea mays oil",                 // rated 3
+    "avocado oil", "persea gratissima oil",      // rated 3
+    "evening primrose oil", "oenothera biennis oil", // rated 3
+    "mink oil",                       // rated 3
+    "soybean oil", "glycine soja oil", // rated 3
+    "shark liver oil",                // rated 3
+    "cotton seed oil", "gossypium herbaceum seed oil", // rated 3
+    "ppg-2 myristyl propionate", "ppg 2 myristyl propionate", // rated 3
+    "ppg-10 cetyl ether", "ppg 10 cetyl ether",  // rated 3
+    "water-soluble sulfur",           // rated 3
+    "stearic acid tea", "stearic acid:tea",       // rated 3
+    "xylene",                         // rated 4 (solvent, rare in cosmetics)
+    "d&c red #3", "d&c red 3",       // rated 3
+    "d&c red #17", "d&c red 17",     // rated 3
+    "d&c red #30", "d&c red 30",     // rated 3
+    "d&c red #36", "d&c red 36",     // rated 3
   ]);
 
-  function isComedogenic(name) {
-    // Strip parenthetical notes e.g. "Cocos Nucifera Oil (Coconut Oil)" → check both
+  // Grade 2 — low concern, borderline (Fulton 1989)
+  const LOW_CONCERN = new Set([
+    // Lanolins — rated 2
+    "lanolin alcohol", "laneth-10", "ppg-12 peg-65 lanolin oil",
+
+    // Fatty acids — rated 2
+    "capric acid", "palmitic acid", "stearic acid",
+    "ascorbyl palmitate", "di (2 ethylhexyl) succinate",
+    "ethylhexyl pelargonate", "isodecyl oleate",
+
+    // Alcohols — rated 2
+    "myristyl alcohol", "cetyl alcohol", "cetearyl alcohol",
+    "stearyl alcohol", "ceteareth-20",
+
+    // Glycols & derivatives — rated 2
+    "pg caprylate/caprate", "pg dipelargonate",
+    "glyceryl stearate se",
+    "pentaerythrital tetra isostearate",
+    "peg-100 distearate", "peg-150 distearate",
+    "steareth-2", "steareth-20",
+    "oleth-10",
+
+    // Oils — rated 2
+    "olive oil", "olea europaea fruit oil",
+    "sandalwood seed oil",
+    "almond oil", "prunus amygdalus dulcis oil",
+    "apricot kernel oil", "prunus armeniaca kernel oil",
+    "peanut oil", "arachis hypogaea oil",
+
+    // Silicones — rated 1 (very low, but worth surfacing)
+    "dimethicone", "simethicone",
+
+    // Waxes — rated 2 (variable)
+    "beeswax", "cera alba",
+    "jojoba oil", "simmondsia chinensis seed oil",
+
+    // Vitamins — rated 2 (variable)
+    "tocopherol", "vitamin e",
+    "vitamin a palmitate", "retinyl palmitate",
+
+    // Misc — rated 2
+    "myristic acid",
+    "phytantriol",
+    "triethanolamine",
+    "d&c red #4", "d&c red 4",
+    "d&c red #21", "d&c red 21",
+    "d&c red #27", "d&c red 27",
+  ]);
+
+  function getComedogenicTier(name) {
     const clean = name.toLowerCase().trim();
-    if (COMEDOGENIC.has(clean)) return true;
-    // Also check content inside parentheses e.g. extract the "coconut oil" part
     const inner = clean.replace(/^[^(]*\(([^)]+)\).*$/, "$1").trim();
-    return COMEDOGENIC.has(inner);
+    if (COMEDOGENIC.has(clean) || COMEDOGENIC.has(inner)) return "high";
+    if (LOW_CONCERN.has(clean) || LOW_CONCERN.has(inner)) return "low";
+    return null;
   }
 
   function showOverlay(state) {
@@ -273,17 +317,18 @@
             </div>`).join("")}
         </div>`;
 
-      // Changes 3 + 4: heads up only for real concerns, comedogenic tag added
+      // Changes 3 + 4: heads up only for real concerns, two-tier comedogenic tags
       const ingredientsHTML = d.ingredients.map(i => {
         const hasRealConcern = i.concerns &&
           !i.concerns.toLowerCase().startsWith("none");
-        const comedogenic = isComedogenic(i.name);
+        const tier = getComedogenicTier(i.name);
         return `
           <div class="cc-ing">
             <div class="cc-ing-name-row">
               <b>${esc(i.name)}</b>
               <span class="cc-tag cc-${tagCls(i.class)}">${esc(i.class)}</span>
-              ${comedogenic ? `<span class="cc-tag cc-comedogenic">comedogenic</span>` : ""}
+              ${tier === "high" ? `<span class="cc-tag cc-comedogenic">comedogenic</span>` : ""}
+              ${tier === "low" ? `<span class="cc-tag cc-lowconcern">low concern</span>` : ""}
             </div>
             <div class="cc-ing-fn">${esc(i.function)}</div>
             ${hasRealConcern ? `

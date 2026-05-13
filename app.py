@@ -75,12 +75,17 @@ Flag these as "beneficial":
 
 For "top_insights": return exactly 3 strings specifically about acne/breakout risk for this product. Always mention: (1) overall verdict for acne-prone skin, (2) the most concerning ingredient if any, (3) a beneficial ingredient or reassurance if no concerns.
 
-For "verdict": return a single sentence (max 15 words) stating clearly whether this product is suitable for acne-prone skin and the specific reason. Examples:
-- "Safe for acne-prone skin — no comedogenic oils or pore-clogging esters detected."
-- "Avoid if acne-prone — contains isopropyl myristate, a known pore-clogger."
-- "Use with caution — fragrance and denatured alcohol may irritate active breakouts."
-- "Good for acne-prone skin — niacinamide and zinc actively help control oil and breakouts."
-Never use vague phrases like "depends on skin type" or "generally safe" without naming a specific ingredient reason.
+For "verdict": start with exactly one of these four labels followed by a dash, then complete the sentence in max 12 words explaining the specific reason:
+- "Excellent —" use when product has multiple acne-fighting or barrier-supporting actives and no concerns
+- "Good —" use when product is safe for acne-prone skin with no significant red flags
+- "Caution —" use when product has some borderline or mildly concerning ingredients
+- "Avoid —" use when product contains confirmed comedogens, irritants, or pore-clogging esters
+Examples:
+- "Excellent — niacinamide, salicylic acid, and zinc actively fight acne and control oil."
+- "Good — no pore-clogging esters or comedogenic oils detected."
+- "Caution — contains fragrance and denatured alcohol which may irritate active breakouts."
+- "Avoid — isopropyl myristate and coconut oil are confirmed pore-cloggers."
+Never use vague phrases without naming a specific ingredient reason.
 
 Return ONLY valid JSON, no markdown. Shape: {"ingredients":[...], "top_insights":[...], "verdict":"..."}"""
 

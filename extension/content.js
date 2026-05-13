@@ -35,7 +35,7 @@
     if (!ingredients || ingredients.length < 8) {
       const opened = tryExpandIngredientSection();
       if (opened) {
-        await waitMs(900);
+        await waitMs(1500);
         ingredients = findIngredients();
       }
     }
@@ -134,6 +134,10 @@
   function parseList(raw) {
     if (!raw) return null;
     const junkWords = /^(read more|show more|see more|view more|less|disclaimer|note|ml|g|oz|inr|rs|rupees|usd|free|new|sale)$/i;
+
+    // Reject free-from claim words e.g. "No parabens, No sulfates" sections
+    const categoryLabels = /^(parabens?|sulfates?|alcohols?|silicones?|mineral oils?|essential oils?|animal products?|fragrances?|dyes?|preservatives?|surfactants?|phthalates?|formaldehyde|microplastics?|no\s+\w+)$/i;
+
     const seen = new Set();
     const parts = raw
       .split(/[,;]/)
@@ -143,11 +147,17 @@
         if (!/[a-z]/i.test(s)) return false;
         if (/^\d+\s*(ml|g|oz|mg|kg|l|%)?$/i.test(s)) return false;
         if (junkWords.test(s)) return false;
+        if (categoryLabels.test(s)) return false;
         const key = s.toLowerCase();
         if (seen.has(key)) return false;
         seen.add(key);
         return true;
       });
+
+    // Reject if looks like a free-from/category list (few items, mostly single words)
+    const singleWordCount = parts.filter(p => !p.includes(" ")).length;
+    if (parts.length < 10 && singleWordCount / parts.length > 0.5) return null;
+
     return parts.length >= 3 ? parts.slice(0, 60) : null;
   }
 

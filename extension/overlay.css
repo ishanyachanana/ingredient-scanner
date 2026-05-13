@@ -35,9 +35,10 @@
   display: inline-block; padding: 5px 12px; border-radius: 999px;
   margin: 10px 0 4px; font-weight: 700; font-size: 12px; letter-spacing: .3px;
 }
-.cc-verdict.safe    { background: #1a7a3a; color: #ffffff; }   /* dark green — safe */
-.cc-verdict.mixed   { background: #c47f00; color: #ffffff; }   /* amber — use with caution */
-.cc-verdict.caution { background: #b71c1c; color: #ffffff; }   /* deep red — avoid */
+.cc-verdict.excellent { background: #bbf7d0; color: #14532d; }   /* pastel green */
+.cc-verdict.good      { background: #d9f99d; color: #1a3d00; }   /* pastel lime */
+.cc-verdict.caution   { background: #fef08a; color: #3d3000; }   /* pastel yellow */
+.cc-verdict.avoid     { background: #fecaca; color: #3d0f0f; }   /* pastel red */
 
 /* Change 1: Top insights section with label + spaced bullet points */
 .cc-insights-block { margin: 14px 0 6px; }

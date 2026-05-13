@@ -18,7 +18,7 @@ def get_client():
         _client = Anthropic(api_key=key)
     return _client
 
-def log_scan(product_name, ingredients_count, marketplace, country, region, verdict):
+def log_scan(product_name, ingredients_count, marketplace, country, region, verdict, top_insights=None, ingredients=None):
     try:
         url = os.environ.get("SUPABASE_URL")
         key = os.environ.get("SUPABASE_KEY")

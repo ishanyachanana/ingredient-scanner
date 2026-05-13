@@ -18,7 +18,7 @@ def get_client():
         _client = Anthropic(api_key=key)
     return _client
 
-def log_scan(product_name, ingredients_count, marketplace, country, region, verdict, top_insights=None, ingredients=None):
+def log_scan(product_name, ingredients_count, marketplace, country, region, verdict):
     try:
         url = os.environ.get("SUPABASE_URL")
         key = os.environ.get("SUPABASE_KEY")
@@ -223,19 +223,22 @@ def analyze_ingredients():
     body = request.get_json(silent=True) or {}
     name = (body.get("name") or "Unknown product").strip()
     ingredients = [i.strip() for i in body.get("ingredients", []) if i and i.strip()]
+    country = request.headers.get("X-Vercel-IP-Country", "Unknown")
+    region = request.headers.get("X-Vercel-IP-Country-Region", "Unknown")
+    marketplace = body.get("marketplace", "Unknown")
+
     if not ingredients:
+        log_scan(name, 0, marketplace, country, region, "error:no_ingredients")
         return (jsonify({"error": "No ingredients provided"}), 400, cors)
 
     try:
         analysis = call_claude(name, ingredients[:25])
     except Exception as e:
+        log_scan(name, len(ingredients), marketplace, country, region, f"error:claude_failed")
         return (jsonify({"error": f"Analysis failed: {e}"}), 500, cors)
 
     verdict = analysis.get("verdict") or compute_verdict(analysis["ingredients"])
 
-    country = request.headers.get("X-Vercel-IP-Country", "Unknown")
-    region = request.headers.get("X-Vercel-IP-Country-Region", "Unknown")
-    marketplace = body.get("marketplace", "Unknown")
     log_scan(name, len(ingredients), marketplace, country, region, verdict,
          top_insights=analysis["top_insights"],
          ingredients=analysis["ingredients"])

@@ -9,15 +9,17 @@
     "https://*.tirabeauty.com/*",
     "https://*.amazon.in/*",
     "https://*.amazon.com/*",
+    "https://*.clinikally.com/*",
     "https://ingredient-scanner-mu.vercel.app/*"
-  ],
+],
   "background": { "service_worker": "background.js" },
   "content_scripts": [{
     "matches": [
       "https://*.nykaa.com/*",
       "https://*.tirabeauty.com/*",
       "https://*.amazon.in/*",
-      "https://*.amazon.com/*"
+      "https://*.amazon.com/*",
+      "https://*.clinikally.com/*"
     ],
     "js": ["content.js"],
     "css": ["overlay.css"],

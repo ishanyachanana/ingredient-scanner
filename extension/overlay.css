@@ -75,8 +75,11 @@
 .cc-tag.cc-neutral { background: #eee;    color: #555; }
 .cc-tag.cc-bad     { background: #fde4e4; color: #9a1b1b; }
 
-/* Change 4: comedogenic tag */
-.cc-tag.cc-comedogenic { background: #fef0db; color: #7a4500; font-weight: 600; }
+/* Change 4: comedogenic tag — grade 4-5 Fulton 1989 */
+.cc-tag.cc-comedogenic { background: #fde4e4; color: #9a1b1b; font-weight: 600; }
+
+/* Two-tier: low concern tag — grade 2 Fulton 1989 */
+.cc-tag.cc-lowconcern { background: #fff4d6; color: #8a5a00; font-weight: 600; }
 
 .cc-ing-fn { color: #666; font-size: 12.5px; }
 

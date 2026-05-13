@@ -32,7 +32,7 @@
     let ingredients = findIngredients();
 
     // Try 2: click anything labeled "Ingredients" to expand accordions/tabs, then scrape again
-    if (!ingredients || ingredients.length < 3) {
+    if (!ingredients || ingredients.length < 8) {
       const opened = tryExpandIngredientSection();
       if (opened) {
         await waitMs(1500);
@@ -41,11 +41,11 @@
     }
 
     // Try 3: regex the full body text as a last resort
-    if (!ingredients || ingredients.length < 3) {
+    if (!ingredients || ingredients.length < 8) {
       ingredients = findByTextPattern();
     }
 
-    if (!ingredients || ingredients.length < 3) {
+    if (!ingredients || ingredients.length < 8) {
       showOverlay({ error: "Ingredients not found. Try scrolling to the ingredients section and expanding it, then click again. If unavailable, this product may not list ingredients on this marketplace." });
       return;
     }
@@ -76,8 +76,7 @@
     const selector = 'button, summary, [role="button"], [role="tab"], [aria-expanded], a, h2, h3, h4, div, span, li';
     const clickables = [...document.querySelectorAll(selector)].filter(el => {
       const t = (el.textContent || "").trim().toLowerCase();
-      if (t.length === 0 || t.length > 60) return false;
-      // Match: "ingredients", "key ingredients", "full ingredients", "ingredient list" etc.
+      if (t.length === 0 || t.length > 50) return false;
       if (!/\bingredients?\b/.test(t)) return false;
       if (el.querySelectorAll("*").length > 20) return false;
       return true;
@@ -93,8 +92,7 @@
     const labels = [...document.querySelectorAll("h1,h2,h3,h4,h5,h6,strong,b,dt,span,div,p,button,summary,th,td")]
       .filter(el => {
         const txt = (el.textContent || "").trim();
-        // Match: "Ingredients", "Key Ingredients", "Full Ingredients", "Ingredient List", "All Ingredients" etc.
-        return /^(key\s+|full\s+|all\s+|complete\s+|active\s+|full\s+list\s+of\s+)?ingredients?\s*(list)?\s*[:\-]?\s*$/i.test(txt) && txt.length < 60;
+        return /^(key\s+|full\s+list\s+of\s+)?ingredients?\s*[:\-]?\s*$/i.test(txt) && txt.length < 50;
       });
     for (const label of labels) {
       const text = grabTextNear(label);
@@ -105,31 +103,20 @@
   }
 
   function grabTextNear(label) {
-    // Check following siblings first
     let sib = label.nextElementSibling;
     while (sib) {
       const t = (sib.textContent || "").trim();
-      // Standard comma-separated text
       if (t.length > 60 && t.includes(",")) return t;
-      // ul/li list (Clinikally-style) — join li items with commas
-      const listItems = [...sib.querySelectorAll("li")]
-        .map(li => li.textContent.trim()).filter(s => s.length > 1);
-      if (listItems.length >= 3) return listItems.join(", ");
       sib = sib.nextElementSibling;
     }
     const parent = label.parentElement;
     if (parent) {
       const raw = (parent.textContent || "").replace(label.textContent || "", "").trim();
       if (raw.length > 60 && raw.includes(",")) return raw;
-      // Check parent's following siblings
       let pnext = parent.nextElementSibling;
       while (pnext) {
         const t = (pnext.textContent || "").trim();
         if (t.length > 60 && t.includes(",")) return t;
-        // ul/li inside parent sibling
-        const listItems = [...pnext.querySelectorAll("li")]
-          .map(li => li.textContent.trim()).filter(s => s.length > 1);
-        if (listItems.length >= 3) return listItems.join(", ");
         pnext = pnext.nextElementSibling;
       }
     }
@@ -138,7 +125,7 @@
 
   function findByTextPattern() {
     const text = (document.body.textContent || "").replace(/\s+/g, " ");
-    const match = text.match(/(?:key\s+|full\s+|all\s+)?ingredients?\s*[:\-]\s*([A-Za-z0-9][^\n]{60,3000})/i);
+    const match = text.match(/ingredients?\s*[:\-]\s*([A-Za-z0-9][^\n]{60,3000})/i);
     if (!match) return null;
     const cut = match[1].split(/\b(?:how to use|directions|warnings?|benefits|about this item|country of origin|storage|shelf life|manufactured)\b/i)[0];
     return parseList(cut);
@@ -379,9 +366,14 @@
   const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const vclass = v => {
     const lower = v.toLowerCase();
-    if (lower.includes("safe") || lower.includes("good for") || lower.startsWith("generally")) return "safe";
-    if (lower.includes("avoid") || lower.includes("not recommended")) return "caution";
-    return "mixed";
+    if (lower.startsWith("excellent")) return "excellent";
+    if (lower.startsWith("good")) return "good";
+    if (lower.startsWith("caution")) return "caution";
+    if (lower.startsWith("avoid")) return "avoid";
+    // fallbacks for any legacy verdicts
+    if (lower.includes("safe") || lower.includes("generally")) return "good";
+    if (lower.includes("avoid") || lower.includes("not recommended")) return "avoid";
+    return "caution";
   };
   const tagCls = c => c === "beneficial" ? "good" : c === "potential concern" ? "bad" : "neutral";
 })();

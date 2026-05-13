@@ -7,6 +7,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_DIR = os.path.join(BASE_DIR, "web")
 
 app = Flask(__name__, static_folder=STATIC_DIR, static_url_path="")
+
 _client = None
 def get_client():
     global _client
@@ -43,7 +44,7 @@ def log_scan(product_name, ingredients_count, marketplace, country, region, verd
         )
     except Exception as e:
         print(f"Logging failed (non-fatal): {e}")
-        
+
 OBF_URL = "https://world.openbeautyfacts.org/api/v2/product/{barcode}.json"
 MODEL = "claude-haiku-4-5-20251001"
 EXTENSION_SECRET = os.environ.get("EXTENSION_SECRET", "")
@@ -72,11 +73,14 @@ Flag these as "beneficial":
 
 For "top_insights": return exactly 3 strings specifically about acne/breakout risk for this product. Always mention: (1) overall verdict for acne-prone skin, (2) the most concerning ingredient if any, (3) a beneficial ingredient or reassurance if no concerns.
 
-Return ONLY valid JSON, no markdown. Shape: {"ingredients":[...], "top_insights":[...]}
+For "verdict": return a single sentence (max 15 words) stating clearly whether this product is suitable for acne-prone skin and the specific reason. Examples:
+- "Safe for acne-prone skin — no comedogenic oils or pore-clogging esters detected."
+- "Avoid if acne-prone — contains isopropyl myristate, a known pore-clogger."
+- "Use with caution — fragrance and denatured alcohol may irritate active breakouts."
+- "Good for acne-prone skin — niacinamide and zinc actively help control oil and breakouts."
+Never use vague phrases like "depends on skin type" or "generally safe" without naming a specific ingredient reason.
 
-Also return "verdict": a single sentence (max 15 words) that states clearly whether this product is suitable for acne-prone skin and why. Be specific — mention the key reason (e.g. "Safe for acne-prone skin — no comedogenic oils or pore-clogging esters detected." or "Avoid if acne-prone — contains isopropyl myristate, a known pore-clogger." or "Use with caution — fragrance and alcohol may irritate active breakouts."). Never say "depends on skin type" or "generally safe" without a specific reason.
-
-Return ONLY valid JSON. Shape: {"ingredients":[...], "top_insights":[...], "verdict":"..."}"""
+Return ONLY valid JSON, no markdown. Shape: {"ingredients":[...], "top_insights":[...], "verdict":"..."}"""
 
 
 @app.route("/")
@@ -119,7 +123,7 @@ def analyze():
         "product": {"name": name, "brand": brand},
         "top_insights": analysis["top_insights"],
         "ingredients": analysis["ingredients"],
-        "verdict": analysis.get("verdict") or compute_verdict(analysis["ingredients"]),,
+        "verdict": analysis.get("verdict") or compute_verdict(analysis["ingredients"]),
     })
 
 
@@ -150,17 +154,16 @@ def call_claude(product_name, ingredients, retries=1):
             parsed = json.loads(text)
             if not isinstance(parsed.get("ingredients"), list) or not isinstance(parsed.get("top_insights"), list):
                 raise ValueError("Claude returned unexpected shape")
-            # Normalize each ingredient
             for ing in parsed["ingredients"]:
                 if ing.get("class") not in ("beneficial", "neutral", "potential concern"):
                     ing["class"] = "neutral"
                 ing.setdefault("function", "")
                 ing.setdefault("concerns", "None")
+                ing.setdefault("acne_risk", "safe")
             parsed["top_insights"] = [str(x) for x in parsed["top_insights"][:3]]
             return parsed
         except Exception as e:
             last_err = e
-            # Retry on transient errors only
             msg = str(e).lower()
             if attempt < retries and ("529" in msg or "overloaded" in msg or "timeout" in msg):
                 time.sleep(1.5)
@@ -201,19 +204,20 @@ def ping():
                                 "_", "PATH", "HOME", "PWD", "LANG", "LC_",
                                 "PYTHON", "TZ", "SHLVL", "HOSTNAME"))],
     })
+
 @app.route("/api/analyze-ingredients", methods=["POST", "OPTIONS"])
 def analyze_ingredients():
     cors = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, X-Client-Secret",
-}
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, X-Client-Secret",
+    }
     if request.method == "OPTIONS":
         return ("", 204, cors)
 
     if EXTENSION_SECRET and request.headers.get("X-Client-Secret") != EXTENSION_SECRET:
         return (jsonify({"error": "Unauthorized"}), 401, cors)
-    
+
     body = request.get_json(silent=True) or {}
     name = (body.get("name") or "Unknown product").strip()
     ingredients = [i.strip() for i in body.get("ingredients", []) if i and i.strip()]
@@ -227,7 +231,6 @@ def analyze_ingredients():
 
     verdict = analysis.get("verdict") or compute_verdict(analysis["ingredients"])
 
-    # Log to Supabase
     country = request.headers.get("X-Vercel-IP-Country", "Unknown")
     region = request.headers.get("X-Vercel-IP-Country-Region", "Unknown")
     marketplace = body.get("marketplace", "Unknown")

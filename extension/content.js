@@ -32,7 +32,7 @@
     let ingredients = findIngredients();
 
     // Try 2: click anything labeled "Ingredients" to expand accordions/tabs, then scrape again
-    if (!ingredients || ingredients.length < 8) {
+    if (!ingredients || ingredients.length < 3) {
       const opened = tryExpandIngredientSection();
       if (opened) {
         await waitMs(1500);
@@ -41,11 +41,11 @@
     }
 
     // Try 3: regex the full body text as a last resort
-    if (!ingredients || ingredients.length < 8) {
+    if (!ingredients || ingredients.length < 3) {
       ingredients = findByTextPattern();
     }
 
-    if (!ingredients || ingredients.length < 8) {
+    if (!ingredients || ingredients.length < 3) {
       showOverlay({ error: "Ingredients not found. Try scrolling to the ingredients section and expanding it, then click again. If unavailable, this product may not list ingredients on this marketplace." });
       return;
     }
@@ -105,20 +105,31 @@
   }
 
   function grabTextNear(label) {
+    // Check following siblings first
     let sib = label.nextElementSibling;
     while (sib) {
       const t = (sib.textContent || "").trim();
+      // Standard comma-separated text
       if (t.length > 60 && t.includes(",")) return t;
+      // ul/li list (Clinikally-style) — join li items with commas
+      const listItems = [...sib.querySelectorAll("li")]
+        .map(li => li.textContent.trim()).filter(s => s.length > 1);
+      if (listItems.length >= 3) return listItems.join(", ");
       sib = sib.nextElementSibling;
     }
     const parent = label.parentElement;
     if (parent) {
       const raw = (parent.textContent || "").replace(label.textContent || "", "").trim();
       if (raw.length > 60 && raw.includes(",")) return raw;
+      // Check parent's following siblings
       let pnext = parent.nextElementSibling;
       while (pnext) {
         const t = (pnext.textContent || "").trim();
         if (t.length > 60 && t.includes(",")) return t;
+        // ul/li inside parent sibling
+        const listItems = [...pnext.querySelectorAll("li")]
+          .map(li => li.textContent.trim()).filter(s => s.length > 1);
+        if (listItems.length >= 3) return listItems.join(", ");
         pnext = pnext.nextElementSibling;
       }
     }
@@ -127,7 +138,7 @@
 
   function findByTextPattern() {
     const text = (document.body.textContent || "").replace(/\s+/g, " ");
-    const match = text.match(/ingredients?\s*[:\-]\s*([A-Za-z0-9][^\n]{60,3000})/i);
+    const match = text.match(/(?:key\s+|full\s+|all\s+)?ingredients?\s*[:\-]\s*([A-Za-z0-9][^\n]{60,3000})/i);
     if (!match) return null;
     const cut = match[1].split(/\b(?:how to use|directions|warnings?|benefits|about this item|country of origin|storage|shelf life|manufactured)\b/i)[0];
     return parseList(cut);

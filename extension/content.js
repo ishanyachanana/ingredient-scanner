@@ -154,12 +154,86 @@
   const waitMs = (ms) => new Promise(r => setTimeout(r, ms));
 
   // Change 4: client-side comedogenic ingredient list
+  // Comedogenic rating 4-5 (high risk) — common names + INCI names
+  // Sources: Kligman & Mills scale, published dermatology comedogenicity research
   const COMEDOGENIC = new Set([
-    "coconut oil","cocoa butter","wheat germ oil","flaxseed oil","palm oil",
-    "isopropyl myristate","isopropyl palmitate","butyl stearate","ethylhexyl palmitate",
-    "sodium lauryl sulfate","lanolin","acetylated lanolin","linseed oil",
-    "olive oil","soybean oil","avocado oil","almond oil","peach kernel oil",
-    "dimethicone","cyclopentasiloxane","algae extract","carrageenan"
+
+    // ── HIGHLY COMEDOGENIC OILS (rating 4-5) ──
+    "coconut oil", "cocos nucifera oil", "cocos nucifera (coconut) oil",
+    "cocoa butter", "theobroma cacao seed butter",
+    "wheat germ oil", "triticum vulgare germ oil", "triticum vulgare (wheat) germ oil",
+    "flaxseed oil", "linum usitatissimum seed oil",
+    "linseed oil",
+    "palm oil", "elaeis guineensis oil",
+    "soybean oil", "glycine soja oil", "glycine soja (soybean) oil",
+    "cotton seed oil", "gossypium herbaceum seed oil",
+    "olive oil", "olea europaea fruit oil", "olea europaea (olive) fruit oil",
+    "corn oil", "zea mays oil",
+    "peach kernel oil", "prunus persica kernel oil",
+    "apricot kernel oil", "prunus armeniaca kernel oil",
+    "almond oil", "sweet almond oil", "prunus amygdalus dulcis oil",
+    "avocado oil", "persea gratissima oil",
+    "sesame oil", "sesamum indicum seed oil",
+    "evening primrose oil", "oenothera biennis oil",
+    "rosehip oil", "rosa canina fruit oil", "rosa moschata seed oil",
+    "marula oil", "sclerocarya birrea seed oil",
+    "hemp seed oil", "cannabis sativa seed oil",
+    "pumpkin seed oil", "cucurbita pepo seed oil",
+
+    // ── MODERATE-HIGH COMEDOGENIC OILS (rating 3-4) ──
+    "shea butter", "butyrospermum parkii butter",
+    "lanolin", "acetylated lanolin", "lanolin alcohol",
+    "mink oil",
+    "carrot oil", "daucus carota sativa oil",
+
+    // ── PORE-CLOGGING ESTERS (rating 4-5) ──
+    "isopropyl myristate",
+    "isopropyl palmitate",
+    "isopropyl isostearate",
+    "butyl stearate",
+    "isostearyl isostearate",
+    "decyl oleate",
+    "octyl stearate",
+    "octyl palmitate", "ethylhexyl palmitate",
+    "myristyl myristate",
+    "myristyl lactate",
+    "isocetyl stearate",
+    "isodecyl oleate",
+    "propylene glycol monostearate",
+    "glyceryl-3-diisostearate",
+    "hexadecyl alcohol",
+
+    // ── IRRITATING / BARRIER-DISRUPTING ──
+    "sodium lauryl sulfate", "sls",
+    "sodium laureth sulfate", "sles",
+    "ammonium lauryl sulfate",
+    "alcohol denat", "denatured alcohol", "sd alcohol",
+    "sd alcohol 40", "alcohol sd-40",
+
+    // ── HEAVY SILICONES (occlusive, rating 3-4) ──
+    "dimethicone",
+    "cyclopentasiloxane",
+    "cyclohexasiloxane",
+    "cyclomethicone",
+
+    // ── ALGAE / SEAWEED (can be comedogenic) ──
+    "algae extract", "algae", "seaweed extract",
+    "carrageenan",
+    "red algae extract",
+
+    // ── OTHER KNOWN COMEDOGENS ──
+    "coal tar",
+    "sodium chloride",          // table salt — clogs pores in rinse-off products
+    "potassium chloride",
+    "lauric acid",              // found in coconut — highly comedogenic component
+    "myristic acid",
+    "stearic acid",             // rating 2-3, included for awareness
+    "acetylated lanolin alcohol",
+    "peg-16 lanolin",
+    "sulfated castor oil",
+    "oleic acid",               // the comedogenic fraction in many oils
+    "d&c red dyes",             // dyes linked to comedogenicity
+    "benzaldehyde"
   ]);
 
   function isComedogenic(name) {

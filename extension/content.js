@@ -163,7 +163,12 @@
   ]);
 
   function isComedogenic(name) {
-    return COMEDOGENIC.has(name.toLowerCase().trim());
+    // Strip parenthetical notes e.g. "Cocos Nucifera Oil (Coconut Oil)" → check both
+    const clean = name.toLowerCase().trim();
+    if (COMEDOGENIC.has(clean)) return true;
+    // Also check content inside parentheses e.g. extract the "coconut oil" part
+    const inner = clean.replace(/^[^(]*\(([^)]+)\).*$/, "$1").trim();
+    return COMEDOGENIC.has(inner);
   }
 
   function showOverlay(state) {
@@ -197,8 +202,7 @@
       // Changes 3 + 4: heads up only for real concerns, comedogenic tag added
       const ingredientsHTML = d.ingredients.map(i => {
         const hasRealConcern = i.concerns &&
-          i.concerns !== "None" &&
-          i.concerns !== "None for acne-prone skin";
+          !i.concerns.toLowerCase().startsWith("none");
         const comedogenic = isComedogenic(i.name);
         return `
           <div class="cc-ing">
@@ -231,6 +235,11 @@
   }
 
   const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-  const vclass = v => v.startsWith("Generally") ? "safe" : v.startsWith("Mixed") ? "mixed" : "caution";
+  const vclass = v => {
+    const lower = v.toLowerCase();
+    if (lower.includes("safe") || lower.includes("good for") || lower.startsWith("generally")) return "safe";
+    if (lower.includes("avoid") || lower.includes("not recommended")) return "caution";
+    return "mixed";
+  };
   const tagCls = c => c === "beneficial" ? "good" : c === "potential concern" ? "bad" : "neutral";
 })();

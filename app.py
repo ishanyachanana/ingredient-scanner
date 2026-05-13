@@ -72,7 +72,11 @@ Flag these as "beneficial":
 
 For "top_insights": return exactly 3 strings specifically about acne/breakout risk for this product. Always mention: (1) overall verdict for acne-prone skin, (2) the most concerning ingredient if any, (3) a beneficial ingredient or reassurance if no concerns.
 
-Return ONLY valid JSON, no markdown. Shape: {"ingredients":[...], "top_insights":[...]}"""
+Return ONLY valid JSON, no markdown. Shape: {"ingredients":[...], "top_insights":[...]}
+
+Also return "verdict": a single sentence (max 15 words) that states clearly whether this product is suitable for acne-prone skin and why. Be specific — mention the key reason (e.g. "Safe for acne-prone skin — no comedogenic oils or pore-clogging esters detected." or "Avoid if acne-prone — contains isopropyl myristate, a known pore-clogger." or "Use with caution — fragrance and alcohol may irritate active breakouts."). Never say "depends on skin type" or "generally safe" without a specific reason.
+
+Return ONLY valid JSON. Shape: {"ingredients":[...], "top_insights":[...], "verdict":"..."}"""
 
 
 @app.route("/")
@@ -115,7 +119,7 @@ def analyze():
         "product": {"name": name, "brand": brand},
         "top_insights": analysis["top_insights"],
         "ingredients": analysis["ingredients"],
-        "verdict": compute_verdict(analysis["ingredients"]),
+        "verdict": analysis.get("verdict") or compute_verdict(analysis["ingredients"]),,
     })
 
 
@@ -221,7 +225,7 @@ def analyze_ingredients():
     except Exception as e:
         return (jsonify({"error": f"Analysis failed: {e}"}), 500, cors)
 
-    verdict = compute_verdict(analysis["ingredients"])
+    verdict = analysis.get("verdict") or compute_verdict(analysis["ingredients"])
 
     # Log to Supabase
     country = request.headers.get("X-Vercel-IP-Country", "Unknown")

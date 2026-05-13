@@ -11,7 +11,7 @@
     "https://*.amazon.com/*",
     "https://*.clinikally.com/*",
     "https://ingredient-scanner-mu.vercel.app/*"
-],
+  ],
   "background": { "service_worker": "background.js" },
   "content_scripts": [{
     "matches": [

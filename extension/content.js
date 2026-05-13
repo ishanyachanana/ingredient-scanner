@@ -18,7 +18,7 @@
     showOverlay({ loading: true });
 
     const name = getProductName();
-    const marketplace = window.location.hostname; // e.g. "www.nykaa.com"
+    const marketplace = window.location.hostname;
 
     // CHECK CACHE FIRST
     const cacheKey = "cc:" + name;
@@ -46,7 +46,7 @@
     }
 
     if (!ingredients || ingredients.length < 8) {
-      showOverlay({ error: "Only found " + (ingredients?.length || 0) + " items — likely marketing text, not the real INCI list. Scroll to the Ingredients accordion on the page, expand it, then click the button again." });
+      showOverlay({ error: "Ingredients not found. Try scrolling to the ingredients section and expanding it, then click again. If unavailable, this product may not list ingredients on this marketplace." });
       return;
     }
 
@@ -153,6 +153,19 @@
 
   const waitMs = (ms) => new Promise(r => setTimeout(r, ms));
 
+  // Change 4: client-side comedogenic ingredient list
+  const COMEDOGENIC = new Set([
+    "coconut oil","cocoa butter","wheat germ oil","flaxseed oil","palm oil",
+    "isopropyl myristate","isopropyl palmitate","butyl stearate","ethylhexyl palmitate",
+    "sodium lauryl sulfate","lanolin","acetylated lanolin","linseed oil",
+    "olive oil","soybean oil","avocado oil","almond oil","peach kernel oil",
+    "dimethicone","cyclopentasiloxane","algae extract","carrageenan"
+  ]);
+
+  function isComedogenic(name) {
+    return COMEDOGENIC.has(name.toLowerCase().trim());
+  }
+
   function showOverlay(state) {
     let root = document.getElementById("cc-overlay");
     if (!root) {
@@ -160,28 +173,60 @@
       root.id = "cc-overlay";
       document.body.appendChild(root);
     }
+
     if (state.loading) {
-      root.innerHTML = `<div class="cc-card"><button class="cc-close">×</button>Analyzing...</div>`;
+      root.innerHTML = `<div class="cc-card"><button class="cc-close">×</button>Analyzing ingredients...</div>`;
+
     } else if (state.error) {
       root.innerHTML = `<div class="cc-card"><button class="cc-close">×</button><div class="cc-err">${esc(state.error)}</div></div>`;
+
     } else {
       const d = state.data;
+
+      // Change 1: top insights as styled bullet points with section label
+      const insightsHTML = `
+        <div class="cc-insights-block">
+          <div class="cc-insights-title">Key Takeaways</div>
+          ${d.top_insights.map(i => `
+            <div class="cc-insight-item">
+              <div class="cc-insight-dot"></div>
+              <div class="cc-insight-text">${esc(i)}</div>
+            </div>`).join("")}
+        </div>`;
+
+      // Changes 3 + 4: heads up only for real concerns, comedogenic tag added
+      const ingredientsHTML = d.ingredients.map(i => {
+        const hasRealConcern = i.concerns &&
+          i.concerns !== "None" &&
+          i.concerns !== "None for acne-prone skin";
+        const comedogenic = isComedogenic(i.name);
+        return `
+          <div class="cc-ing">
+            <div class="cc-ing-name-row">
+              <b>${esc(i.name)}</b>
+              <span class="cc-tag cc-${tagCls(i.class)}">${esc(i.class)}</span>
+              ${comedogenic ? `<span class="cc-tag cc-comedogenic">comedogenic</span>` : ""}
+            </div>
+            <div class="cc-ing-fn">${esc(i.function)}</div>
+            ${hasRealConcern ? `
+              <div class="cc-concern">
+                <span class="cc-concern-icon">⚠️</span>
+                <span>${esc(i.concerns)}</span>
+              </div>` : ""}
+          </div>`;
+      }).join("");
+
       root.innerHTML = `
         <div class="cc-card">
           <button class="cc-close">×</button>
           <div class="cc-name">${esc(d.product.name)}</div>
           <div class="cc-verdict ${vclass(d.verdict)}">${esc(d.verdict)}</div>
-          <h4>Top insights</h4>
-          <ul>${d.top_insights.map(i => `<li>${esc(i)}</li>`).join("")}</ul>
-          <h4>Ingredients</h4>
-          ${d.ingredients.map(i => `
-            <div class="cc-ing">
-              <div><b>${esc(i.name)}</b> <span class="cc-tag cc-${tagCls(i.class)}">${esc(i.class)}</span></div>
-              <div>${esc(i.function)}</div>
-              ${i.concerns && i.concerns !== "None" ? `<div class="cc-concern">Heads up: ${esc(i.concerns)}</div>` : ""}
-            </div>`).join("")}
+          ${insightsHTML}
+          <div class="cc-section-title">Ingredient Breakdown</div>
+          ${ingredientsHTML}
         </div>`;
     }
+
     root.querySelector(".cc-close")?.addEventListener("click", () => root.remove());
   }
 

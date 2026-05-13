@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "INCI Scanner",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Understand cosmetic ingredients on marketplace product pages.",
   "permissions": ["storage"],
   "host_permissions": [

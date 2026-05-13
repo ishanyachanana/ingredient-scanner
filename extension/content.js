@@ -76,7 +76,8 @@
     const selector = 'button, summary, [role="button"], [role="tab"], [aria-expanded], a, h2, h3, h4, div, span, li';
     const clickables = [...document.querySelectorAll(selector)].filter(el => {
       const t = (el.textContent || "").trim().toLowerCase();
-      if (t.length === 0 || t.length > 50) return false;
+      if (t.length === 0 || t.length > 60) return false;
+      // Match: "ingredients", "key ingredients", "full ingredients", "ingredient list" etc.
       if (!/\bingredients?\b/.test(t)) return false;
       if (el.querySelectorAll("*").length > 20) return false;
       return true;
@@ -92,7 +93,8 @@
     const labels = [...document.querySelectorAll("h1,h2,h3,h4,h5,h6,strong,b,dt,span,div,p,button,summary,th,td")]
       .filter(el => {
         const txt = (el.textContent || "").trim();
-        return /^(key\s+|full\s+list\s+of\s+)?ingredients?\s*[:\-]?\s*$/i.test(txt) && txt.length < 50;
+        // Match: "Ingredients", "Key Ingredients", "Full Ingredients", "Ingredient List", "All Ingredients" etc.
+        return /^(key\s+|full\s+|all\s+|complete\s+|active\s+|full\s+list\s+of\s+)?ingredients?\s*(list)?\s*[:\-]?\s*$/i.test(txt) && txt.length < 60;
       });
     for (const label of labels) {
       const text = grabTextNear(label);

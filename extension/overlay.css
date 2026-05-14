@@ -11,14 +11,15 @@
   overflow: auto; z-index: 2147483647;
   font: 14px system-ui, sans-serif;
   border-radius: 16px;
-  background: linear-gradient(135deg, #f5ede4 0%, #faf6f2 35%, #eef4f8 70%, #ddeef6 100%);
-  box-shadow: 0 12px 40px rgba(0,0,0,.2);
+  background: linear-gradient(135deg, #ecddd0 0%, #f0e8e0 30%, #dde8f0 70%, #c8dff0 100%);
+  box-shadow: 0 12px 40px rgba(0,0,0,.28);
+  border: 1px solid rgba(180,160,140,.35);
   padding: 4px;
 }
 
 /* Card semi-transparent so gradient shows through */
 .cc-card {
-  background: rgba(255,255,255,0.78);
+  background: rgba(255,255,255,0.88);
   backdrop-filter: blur(8px);
   color: #222; border-radius: 13px; padding: 18px;
   position: relative;

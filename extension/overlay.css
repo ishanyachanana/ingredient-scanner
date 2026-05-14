@@ -1,41 +1,44 @@
 #cc-btn {
-  position: fixed; right: 20px; bottom: 20px; z-index: 2147483646;
-  background: #222; color: #fff; border: 0; border-radius: 999px;
-  padding: 12px 18px; font: 600 14px system-ui, sans-serif; cursor: pointer;
-  box-shadow: 0 4px 14px rgba(0,0,0,.2);
+position: fixed; right: 20px; bottom: 20px; z-index: 2147483646;
+background: #222; color: #fff; border: 0; border-radius: 999px;
+padding: 12px 18px; font: 600 14px system-ui, sans-serif; cursor: pointer;
+box-shadow: 0 4px 14px rgba(0,0,0,.2);
 }
 
 /* Change 2: warm cream top-left → white centre → cool powder blue bottom-right */
 #cc-overlay {
-  position: fixed; right: 20px; bottom: 80px; width: 390px; max-height: 72vh;
-  overflow: auto; z-index: 2147483647;
-  font: 14px system-ui, sans-serif;
-  border-radius: 16px;
-  background: linear-gradient(135deg, #ecddd0 0%, #f0e8e0 30%, #dde8f0 70%, #c8dff0 100%);
-  box-shadow: 0 12px 40px rgba(0,0,0,.28);
-  border: 1px solid rgba(180,160,140,.35);
-  padding: 4px;
+position: fixed; right: 20px; bottom: 80px; width: 390px; max-height: 72vh;
+overflow: auto; z-index: 2147483647;
+font: 14px system-ui, sans-serif;
+border-radius: 16px;
+background: linear-gradient(135deg, #f5ede4 0%, #faf6f2 35%, #eef4f8 70%, #ddeef6 100%);
+box-shadow: 0 12px 40px rgba(0,0,0,.2);
+padding: 4px;
 }
 
 /* Card semi-transparent so gradient shows through */
 .cc-card {
-  background: rgba(255,255,255,0.88);
-  backdrop-filter: blur(8px);
-  color: #222; border-radius: 13px; padding: 18px;
-  position: relative;
+background: rgba(255,255,255,0.78);
+backdrop-filter: blur(8px);
+color: #222; border-radius: 13px; padding: 18px;
+position: relative;
 }
 
 .cc-close {
-  position: absolute; top: 10px; right: 12px; border: 0; background: none;
-  font-size: 20px; cursor: pointer; color: #999;
+position: absolute; top: 10px; right: 12px; border: 0; background: none;
+font-size: 20px; cursor: pointer; color: #999;
 }
 
 .cc-name { font-weight: 700; font-size: 15px; margin-right: 24px; line-height: 1.4; }
 
 .cc-verdict {
-  display: inline-block; padding: 5px 12px; border-radius: 999px;
-  margin: 10px 0 4px; font-weight: 700; font-size: 12px; letter-spacing: .3px;
+display: inline-block; padding: 5px 12px; border-radius: 999px;
+margin: 10px 0 4px; font-weight: 700; font-size: 12px; letter-spacing: .3px;
 }
+.cc-verdict.excellent { background: #bbf7d0; color: #14532d; }   /* pastel green */
+.cc-verdict.good      { background: #d9f99d; color: #1a3d00; }   /* pastel lime */
+.cc-verdict.caution   { background: #fef08a; color: #3d3000; }   /* pastel yellow */
+.cc-verdict.avoid     { background: #fecaca; color: #3d0f0f; }   /* pastel red */
 .cc-verdict.excellent { background: #c8f0d4; color: #1e6b33; }   /* brighter beneficial green */
 .cc-verdict.good      { background: #e7f5ea; color: #1e6b33; }   /* same as beneficial tag */
 .cc-verdict.caution   { background: #fff4d6; color: #8a5a00; }   /* same as low concern tag */
@@ -44,33 +47,33 @@
 /* Change 1: Top insights section with label + spaced bullet points */
 .cc-insights-block { margin: 14px 0 6px; }
 .cc-insights-title {
-  font-size: 11px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: .7px; color: #999; margin-bottom: 9px;
+font-size: 11px; font-weight: 700; text-transform: uppercase;
+letter-spacing: .7px; color: #999; margin-bottom: 9px;
 }
 .cc-insight-item {
-  display: flex; gap: 9px; align-items: flex-start;
-  margin-bottom: 8px; line-height: 1.5;
+display: flex; gap: 9px; align-items: flex-start;
+margin-bottom: 8px; line-height: 1.5;
 }
 .cc-insight-dot {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: linear-gradient(135deg, #c9a882, #8bbdd4);
-  margin-top: 6px; flex-shrink: 0;
+width: 6px; height: 6px; border-radius: 50%;
+background: linear-gradient(135deg, #c9a882, #8bbdd4);
+margin-top: 6px; flex-shrink: 0;
 }
 .cc-insight-text { font-size: 13px; color: #333; }
 
 /* Change 1: Ingredient breakdown section heading */
 .cc-section-title {
-  font-size: 11px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: .7px; color: #999; margin: 16px 0 6px;
+font-size: 11px; font-weight: 700; text-transform: uppercase;
+letter-spacing: .7px; color: #999; margin: 16px 0 6px;
 }
 
 .cc-ing {
-  border-top: 1px solid rgba(0,0,0,.07);
-  padding: 9px 0; font-size: 13px; line-height: 1.5;
+border-top: 1px solid rgba(0,0,0,.07);
+padding: 9px 0; font-size: 13px; line-height: 1.5;
 }
 .cc-ing-name-row {
-  display: flex; align-items: center; flex-wrap: wrap;
-  gap: 5px; margin-bottom: 3px;
+display: flex; align-items: center; flex-wrap: wrap;
+gap: 5px; margin-bottom: 3px;
 }
 .cc-tag { font-size: 11px; padding: 2px 7px; border-radius: 999px; }
 .cc-tag.cc-good    { background: #e7f5ea; color: #1e6b33; }
@@ -87,10 +90,10 @@
 
 /* Change 3: heads up box — only rendered when a real concern exists */
 .cc-concern {
-  display: flex; gap: 7px; align-items: flex-start;
-  color: #7a4500; margin-top: 5px; font-size: 12px;
-  background: #fff8ee; border-radius: 7px; padding: 6px 9px;
-  line-height: 1.45;
+display: flex; gap: 7px; align-items: flex-start;
+color: #7a4500; margin-top: 5px; font-size: 12px;
+background: #fff8ee; border-radius: 7px; padding: 6px 9px;
+line-height: 1.45;
 }
 .cc-concern-icon { flex-shrink: 0; font-size: 13px; }
 
